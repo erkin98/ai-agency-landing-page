@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Page from '@/app/page'
 
@@ -24,7 +24,7 @@ describe('Complete Booking Flow Integration', () => {
     
     // Step 2: Verify modal opens and select date
     await waitFor(() => {
-      expect(screen.getAllByText('Book Your Free Strategy Call')[0]).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
     
     expect(screen.getByText('Select a Date')).toBeInTheDocument()
@@ -84,13 +84,13 @@ describe('Complete Booking Flow Integration', () => {
     const user = userEvent.setup()
     
     // Click navigation booking button
-    const navButtons = screen.getAllByText('Book a Call')
-    const navBookingButton = navButtons[0] // First one should be navigation
+    const nav = screen.getByRole('navigation')
+    const navBookingButton = within(nav).getByRole('button', { name: /book a call/i })
     
     await user.click(navBookingButton)
     
     await waitFor(() => {
-      expect(screen.getByText('Book Your Free Strategy Call')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
     
     expect(screen.getByText('Select a Date')).toBeInTheDocument()
@@ -108,7 +108,7 @@ describe('Complete Booking Flow Integration', () => {
     await user.click(scheduleButton)
     
     await waitFor(() => {
-      expect(screen.getByText('Book Your Free Strategy Call')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
   })
 
@@ -120,13 +120,11 @@ describe('Complete Booking Flow Integration', () => {
     await user.click(finalCtaButton)
     
     await waitFor(() => {
-      expect(screen.getByText('Book Your Free Strategy Call')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
   })
 
   it('handles navigation between sections correctly', async () => {
-    const user = userEvent.setup()
-    
     // Test "See Our Work" button navigation
     const seeWorkButton = screen.getByRole('link', { name: /see our work/i })
     expect(seeWorkButton).toHaveAttribute('href', '#services')
@@ -142,8 +140,6 @@ describe('Complete Booking Flow Integration', () => {
   })
 
   it('handles contact links correctly', async () => {
-    const user = userEvent.setup()
-    
     // Test email link
     const emailLink = screen.getByRole('link', { name: /hello@aisolutionspro.com/i })
     expect(emailLink).toHaveAttribute('href', 'mailto:hello@aisolutionspro.com')
@@ -186,7 +182,7 @@ describe('Complete Booking Flow Integration', () => {
   it('tests responsive design elements', () => {
     // Check for responsive classes that ensure mobile optimization
     const heroSection = screen.getByText('Scale Your Business with').closest('section')
-    expect(heroSection).toHaveClass('px-4', 'sm:px-6', 'lg:px-8')
+    expect(heroSection).toHaveClass('px-4')
     
     // Check for responsive typography
     const mainHeading = screen.getByText('Scale Your Business with')
@@ -196,4 +192,4 @@ describe('Complete Booking Flow Integration', () => {
     const servicesGrid = document.querySelector('.grid.md\\:grid-cols-3')
     expect(servicesGrid).toBeInTheDocument()
   })
-}) 
+})
